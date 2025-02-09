@@ -1,0 +1,25 @@
+[project]
+name = "waydroid-upgrade"
+version = "0.1.0"
+description = "Check for upgrades for Waydroid images without restarting the sessions"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = ["aiohttp>=3.11.12"]
+license = "GPL-3.0-or-later"
+
+[project.scripts]
+waydroid-upgrade = "waydroid_upgrade:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# [tool.uv.venv]
+# system-site-packages = true
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "T20", # flake8-print
+    "FA",  # flake8-future-annotations
+]
