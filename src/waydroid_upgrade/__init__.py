@@ -23,11 +23,8 @@ from .tools import config
 async def get_update_json(
     session: aiohttp.ClientSession,
     url: str,
-    headers: dict | None = None,
 ) -> list[dict]:
-    """Fetch JSON from a URL."""
-    if headers is None:
-        headers = {}
+    """Fetch Waydroid update JSON from a URL."""
     logging.info('Checking "%s" for updates', url)
     async with session.get(url) as response:
         response.raise_for_status()
@@ -45,7 +42,8 @@ async def async_main() -> int:
     )
 
     cfg = config.load()
-    images_path = cfg["waydroid"]["images_path"]
+    waydroid_config = cfg["waydroid"]
+    images_path = waydroid_config["images_path"]
 
     if images_path in config.defaults["preinstalled_images_paths"]:
         logging.warning(
@@ -53,10 +51,10 @@ async def async_main() -> int:
             images_path,
         )
 
-        return -1
+        return 0
 
-    system_ota_url = cfg["waydroid"]["system_ota"]
-    vendor_ota_url = cfg["waydroid"]["vendor_ota"]
+    system_ota_url = waydroid_config["system_ota"]
+    vendor_ota_url = waydroid_config["vendor_ota"]
 
     async with aiohttp.ClientSession() as session:
         system_responses, vendor_responses = await asyncio.gather(
@@ -66,19 +64,21 @@ async def async_main() -> int:
 
         updates = 0
 
-        system_datetime = system_responses[0]["datetime"]
-        if system_datetime > int(cfg["waydroid"]["system_datetime"]):
+        system_datetime: int = system_responses[0]["datetime"]
+        local_system_datetime = int(waydroid_config["system_datetime"])
+        if system_datetime > local_system_datetime:
             logging.info("System upgrade available: %s", system_datetime)
             updates += 1
         else:
-            logging.info("System is up to date: %s", system_datetime)
+            logging.info("System is up to date: %s", local_system_datetime)
 
-        vendor_datetime = vendor_responses[0]["datetime"]
-        if vendor_datetime > int(cfg["waydroid"]["vendor_datetime"]):
+        vendor_datetime: int = vendor_responses[0]["datetime"]
+        local_vendor_datetime = int(waydroid_config["vendor_datetime"])
+        if vendor_datetime > local_vendor_datetime:
             logging.info("Vendor upgrade available: %s", vendor_datetime)
             updates += 1
         else:
-            logging.info("Vendor is up to date: %s", vendor_datetime)
+            logging.info("Vendor is up to date: %s", local_vendor_datetime)
 
         if updates != 0:
             if os.environ.get("NO_UPGRADE"):
