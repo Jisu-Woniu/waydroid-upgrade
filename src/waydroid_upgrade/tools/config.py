@@ -1,7 +1,8 @@
 # Copyright 2021 Oliver Smith
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-"""Waydroid configuration loader.
+"""
+Waydroid configuration loader.
 
 Derived from https://github.com/waydroid/waydroid/tree/7b31f7188a382ead687d291e5a168895efcc6747/tools/config,
 and removed unused imports and dependencies.

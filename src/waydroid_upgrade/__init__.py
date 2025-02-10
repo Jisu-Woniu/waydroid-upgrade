@@ -1,11 +1,14 @@
-"""Checks for upgrades for Waydroid images without restarting sessions.
+"""
+Checks for upgrades for Waydroid images without restarting sessions.
 
 This script is intended to be run as a normal user,
 since it will not write anything to the system.
 
-If an upgrade is available, it will be applied by calling "sudo waydroid upgrade".
-You can override this behavior by setting the "NO_UPGRADE" environment variable.
+If an upgrade is available, it will call "sudo waydroid upgrade" to apply that.
+You can skip that by setting the "NO_UPGRADE" environment variable.
 """
+
+from __future__ import annotations
 
 import asyncio
 import logging
@@ -14,7 +17,7 @@ import sys
 
 import aiohttp
 
-from tools import config
+from .tools import config
 
 
 async def get_update_json(
@@ -34,7 +37,12 @@ async def get_update_json(
 
 async def async_main() -> int:
     """Async entry point for the script."""
-    # Prepare required arguments
+    logging.basicConfig(
+        level=logging.INFO,
+        format="[{asctime}.{msecs:03.0f} {levelname}] {message}",
+        style="{",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
 
     cfg = config.load()
     images_path = cfg["waydroid"]["images_path"]
@@ -92,12 +100,6 @@ async def async_main() -> int:
 
 def main() -> int:
     """Entry point for the script."""
-    logging.basicConfig(
-        level=logging.INFO,
-        format="[{asctime}.{msecs:03.0f} {levelname}] {message}",
-        style="{",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
     return asyncio.run(async_main())
 
 
