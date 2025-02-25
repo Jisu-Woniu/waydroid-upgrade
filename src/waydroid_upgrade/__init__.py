@@ -20,10 +20,15 @@ import aiohttp
 from .tools import config
 
 
+type JsonValues = (
+    None | bool | float | int | str | list[JsonValues] | dict[str, JsonValues]
+)
+
+
 async def get_update_json(
     session: aiohttp.ClientSession,
     url: str,
-) -> list[dict]:
+) -> list[dict[str, JsonValues]]:
     """Fetch Waydroid update JSON from a URL."""
     logging.info('Checking "%s" for updates', url)
     async with session.get(url) as response:
@@ -34,13 +39,6 @@ async def get_update_json(
 
 async def async_main() -> int:
     """Async entry point for the script."""
-    logging.basicConfig(
-        level=logging.INFO,
-        format="[{asctime}.{msecs:03.0f} {levelname}] {message}",
-        style="{",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
-
     cfg = config.load()
     waydroid_config = cfg["waydroid"]
     images_path = waydroid_config["images_path"]
@@ -62,9 +60,13 @@ async def async_main() -> int:
             get_update_json(session, vendor_ota_url),
         )
 
+        logging.info("Extraction completed.")
+
         updates = 0
 
-        system_datetime: int = system_responses[0]["datetime"]
+        system_datetime = system_responses[0]["datetime"]
+        assert isinstance(system_datetime, int)
+
         local_system_datetime = int(waydroid_config["system_datetime"])
         if system_datetime > local_system_datetime:
             logging.info("System upgrade available: %s", system_datetime)
@@ -72,7 +74,9 @@ async def async_main() -> int:
         else:
             logging.info("System is up to date: %s", local_system_datetime)
 
-        vendor_datetime: int = vendor_responses[0]["datetime"]
+        vendor_datetime = vendor_responses[0]["datetime"]
+        assert isinstance(vendor_datetime, int)
+
         local_vendor_datetime = int(waydroid_config["vendor_datetime"])
         if vendor_datetime > local_vendor_datetime:
             logging.info("Vendor upgrade available: %s", vendor_datetime)
@@ -100,6 +104,13 @@ async def async_main() -> int:
 
 def main() -> int:
     """Entry point for the script."""
+    logging.basicConfig(
+        level=logging.INFO,
+        format="[{asctime}.{msecs:03.0f} {levelname}] {message}",
+        style="{",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+
     return asyncio.run(async_main())
 
 

@@ -24,8 +24,8 @@ defaults = {
         "/etc/waydroid-extra/images",
         "/usr/share/waydroid-extra/images",
     ],
+    "images_path": "/var/lib/waydroid/images",
 }
-defaults["images_path"] = defaults["work"] + "/images"
 
 
 def load() -> configparser.ConfigParser:
@@ -40,8 +40,8 @@ def load() -> configparser.ConfigParser:
     if "waydroid" not in cfg:
         cfg["waydroid"] = {}
 
-    for key in defaults.items():
+    for [key, value] in defaults.items():
         if key in config_keys and key not in cfg["waydroid"]:
-            cfg["waydroid"][key] = str(defaults[key])
+            cfg["waydroid"][key] = str(value)
 
     return cfg
