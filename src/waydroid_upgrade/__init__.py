@@ -19,7 +19,6 @@ import aiohttp
 
 from .tools import config
 
-
 type JsonValues = (
     None | bool | float | int | str | list[JsonValues] | dict[str, JsonValues]
 )

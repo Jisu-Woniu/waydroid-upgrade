@@ -7,7 +7,7 @@ authors = [
     { name = "Jisu-Woniu", email = "31986081+Jisu-Woniu@users.noreply.github.com" },
 ]
 requires-python = ">=3.9"
-dependencies = ["aiohttp>=3.11.12"]
+dependencies = ["aiohttp>=3.11.18"]
 license = "GPL-3.0-or-later"
 
 [project.scripts]
@@ -21,7 +21,7 @@ build-backend = "hatchling.build"
 # system-site-packages = true
 
 [tool.ruff.lint]
-select = ["D", "E4", "E7", "E9", "F", "W"]
+select = ["ASYNC", "D", "E4", "E7", "E9", "F", "I", "PL", "RUF", "SIM", "W"]
 ignore = [
     "D203", # incorrect-blank-line-before-class
     "D212", # multi-line-summary-first-line
